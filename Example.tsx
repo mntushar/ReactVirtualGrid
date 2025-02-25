@@ -25,7 +25,7 @@ export default function Example() {
       const data = await response.json();
       
       const url = `${http://localhost:3000}/count?${searchKey}`;
-      const response = await fetch(uri);
+      const response = await fetch(url);
       if(!response.ok) throw new Error();
       const count = await response.json();
       return {
