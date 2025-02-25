@@ -20,7 +20,7 @@ export default function Example() {
             searchKey: searchKey,
         });
       const url = `${http://localhost:3000}/list?${params}`;
-      const response = await fetch(uri);
+      const response = await fetch(url);
       if(!response.ok) throw new Error();
       const data = await response.json();
       
