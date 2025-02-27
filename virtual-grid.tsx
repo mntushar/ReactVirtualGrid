@@ -1,5 +1,5 @@
 import React, { useEffect, useState, forwardRef, ReactNode, useRef, useCallback, useImperativeHandle } from "react";
-import "./virtual-grid.css";
+import "./virtual_grid.css";
 
 interface PropertyColumnProps {
   title: string;
@@ -62,6 +62,8 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
     const buffer = 10;
     const [data, setData] = useState<Map<number, any>>(new Map());
     const [totalCount, setTotalCount] = useState(0);
+    const [isRefresh, setIsRefresh] = useState(false);
+    const [isInitial, setIsInitial] = useState(true);
     const [propertyColumns, setPropertyColumns] = useState<PropertyColumnProps[]>([]);
     const [templateColumns, setTemplateColumns] = useState<TemplateColumnProps[]>([]);
     const [visibleRange, setVisibleRange] = useState({ start: 0, end: 30 });
@@ -108,11 +110,14 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
     }, [fetchData, totalCount]);
 
     const refresh = useCallback(async () => {
-      const { start, end } = visibleRange;
+      setIsRefresh(true);
       const currentRequestId = Date.now();
       requestRef.current.requestId = currentRequestId;
-      await fetchDataForRange(start, end);
-    }, [fetchDataForRange, visibleRange]);
+      setTimeout(() => {
+        setIsRefresh(false);
+      }, 10)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useImperativeHandle(ref, () => ({
       refresh,
@@ -126,10 +131,11 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
       React.Children.forEach(children, child => {
         if (React.isValidElement(child)) {
           if (child.type === PropertyColumn) {
-            pc.push({ 
-              title: child.props.title, 
+            pc.push({
+              title: child.props.title,
               property: child.props.property,
-              format: child.props.format });
+              format: child.props.format
+            });
           } else if (child.type === TemplateColumn) {
             tc.push({ title: child.props.title, children: child.props.children });
           }
@@ -163,16 +169,27 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
     // Fetch data when visible range changes
     useEffect(() => {
       const { start, end } = visibleRange;
+      if (start === 0 && end === 30) return;
       if (start >= 0 && end >= start) {
         fetchDataForRange(start, end);
       }
-    }, [visibleRange, fetchDataForRange]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [visibleRange]);
 
     // Initial data load
     useEffect(() => {
-      const initialVisibleRows = Math.ceil(height / rowHeight) + buffer * 2;
-      fetchDataForRange(0, initialVisibleRows - 1);
-    }, [height, rowHeight, fetchDataForRange]);
+      if (isInitial) {
+        const initialVisibleRows = Math.ceil(height / rowHeight) + buffer * 2;
+        fetchDataForRange(0, initialVisibleRows - 1);
+        setIsInitial(false);
+      }
+
+      if (isRefresh) {
+        const { start, end } = visibleRange;
+        fetchDataForRange(start, end);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isRefresh]);
 
     // Cleanup timeout on unmount
     useEffect(() => {
@@ -185,7 +202,7 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
 
     const applyFormat = (value: any, format: string) => {
       if (!value) return "...";
-    
+
       switch (format) {
         case "uppercase":
           return String(value).toUpperCase();
@@ -197,7 +214,7 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
           return value;
       }
     };
-    
+
     const renderRow = (index: number) => {
       const rowData = data.get(index);
 
@@ -212,8 +229,8 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
           }}
         >
           {propertyColumns.map((col, colIndex) => (
-            <td key={colIndex}>{col.format 
-              ? applyFormat(rowData?.[col.property], col.format) 
+            <td key={colIndex}>{col.format
+              ? applyFormat(rowData?.[col.property], col.format)
               : rowData?.[col.property] || "..."}</td>
           ))}
           {templateColumns.map((template, templateIndex) => (
