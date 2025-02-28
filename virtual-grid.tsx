@@ -178,16 +178,19 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
 
     // Initial data load
     useEffect(() => {
-      if (isInitial) {
-        const initialVisibleRows = Math.ceil(height / rowHeight) + buffer * 2;
-        fetchDataForRange(0, initialVisibleRows - 1);
-        setIsInitial(false);
-      }
+      const fetchData = async () => {
+        if (isInitial) {
+          const initialVisibleRows = Math.ceil(height / rowHeight) + buffer * 2;
+          await fetchDataForRange(0, initialVisibleRows - 1);
+          setIsInitial(false);
+        }
 
-      if (isRefresh) {
-        const { start, end } = visibleRange;
-        fetchDataForRange(start, end);
+        if (isRefresh) {
+          const { start, end } = visibleRange;
+          await fetchDataForRange(start, end);
+        }
       }
+      fetchData();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isRefresh]);
 
@@ -252,11 +255,7 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
       <div
         ref={containerRef}
         className="virtual-grid-container"
-        style={{
-          height,
-          overflowY: "auto",
-          position: "relative",
-        }}
+        style={{ height, overflowY: "auto", position: "relative" }}
         onScroll={handleScroll}
       >
         <table style={{ width: "100%", position: "relative" }}>
@@ -270,11 +269,19 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
               ))}
             </tr>
           </thead>
-          <tbody style={{ position: "relative", height: totalCount * rowHeight }}>
-            {Array.from(
-              { length: visibleRange.end - visibleRange.start + 1 },
-              (_, i) => visibleRange.start + i
-            ).map(renderRow)}
+          <tbody style={{ position: "relative", height: totalCount * rowHeight || 'auto' }}>
+            {isInitial ? (
+              <tr style={{ backgroundColor: "white" }}>
+                <td style={{ height: height }} className="spinner-container">
+                  <div className="spinner"></div>
+                </td>
+              </tr>
+            ) : (
+              Array.from(
+                { length: visibleRange.end - visibleRange.start + 1 },
+                (_, i) => visibleRange.start + i
+              ).map(renderRow)
+            )}
           </tbody>
         </table>
       </div>
