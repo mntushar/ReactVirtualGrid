@@ -10,27 +10,26 @@ export default function Home() {
 
   const fetchData = useCallback(async (request: GridRequest) => {
     try {
-      // const params = new URLSearchParams({
-      //   skip: request.startIndex.toString(),
-      //   limit: request.limit.toString(),
-      //   sortColumn: request.sortColumn ?? '',
-      //   sortOrder: request.sortOrder ?? '',
-      //   searchKey: searchKey ?? '',
-      // });
-      // const url = `http://localhost:3000/brand?${params}`;
-      const url = `https://jsonplaceholder.typicode.com/comments`;
+      const params = new URLSearchParams({
+        skip: request.startIndex.toString(),
+        limit: request.limit.toString(),
+        sortColumn: request.sortColumn ?? '',
+        sortOrder: request.sortOrder ?? '',
+        searchKey: searchKey ?? '',
+      });
+      const url = `http://your-url/brand?${params}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error();
       const data = await response.json();
 
-      // const countUrl = `http://localhost:3000}/brand/count?${searchKey}`;
-      // const countResponse = await fetch(countUrl);
-      // if (!countResponse.ok) throw new Error();
-      // const count = await response.json();
+      const countUrl = `http://your-url/brand/count?${searchKey}`;
+      const countResponse = await fetch(countUrl);
+      if (!countResponse.ok) throw new Error();
+      const count = await response.json();
 
       return {
         items: data,
-        totalCount: 500,
+        totalCount: count,
       };
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -41,19 +40,10 @@ export default function Home() {
     }
   }, [searchKey]);
 
-  const isActiveDelete = (id: string) => {
+  const handleDelete = (id: string) => {
     try {
-
-    } catch (error) {
-      console.error("Error deleting item:", error);
-    }
-  };
-
-  const handleDelete = async (isDelete: boolean) => {
-    try {
-      if (isDelete) {
-        gridRef.current?.refresh();
-      }
+      console.log(id)
+      gridRef.current?.refresh();
     } catch (error) {
       console.error("Error deleting item:", error);
     }
@@ -61,6 +51,7 @@ export default function Home() {
 
   const handleEdit = (id: string) => {
     try {
+      console.log(id);
     } catch (error) {
       console.error(error);
     }
@@ -70,6 +61,7 @@ export default function Home() {
     try {
       setSearchKey(event.target.value);
       gridRef.current?.refresh();
+      console.log(searchKey);
     } catch (error) {
       console.error(error);
     }
@@ -78,7 +70,17 @@ export default function Home() {
   return (
     <div>
       <h1>Alhamdulillah</h1>
-      <br/>
+      <br />
+
+      <div className="seacrh">
+        <input
+          type="text"
+          className="seacrh-input"
+          id="seach-input-id"
+          placeholder="Enter Search Key..."
+          onChange={handleSearch}
+        />
+      </div>
 
       <VirtualGrid
         ref={gridRef}
@@ -104,7 +106,7 @@ export default function Home() {
           </button>
 
           <button type="button" className="action-button"
-            onClick={(row) => isActiveDelete((row as any).id)}
+            onClick={(row) => handleDelete((row as any).id)}
           >
             <Image
               src='/images/icons8-delete-128.png'
