@@ -10,7 +10,8 @@ The VirtualGrid component is a React-based virtualized grid designed to efficien
 - **children (ReactNode)** - Used to define columns via PropertyColumn and TemplateColumn.
 
 ### Column Types
-- **PropertyColumn** - Defines columns based on object properties.
+- **PropertyColumn**
+- - Defines columns based on object properties.
 - **TemplateColumn** - Allows custom content (e.g., buttons, icons) inside a column.
 
 
