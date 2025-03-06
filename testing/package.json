@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "react-virtual-grid-table": "^1.0.1"
+  }
+}

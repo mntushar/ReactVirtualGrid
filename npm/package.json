@@ -1,0 +1,43 @@
+{
+  "name": "react-virtual-grid-table",
+  "version": "1.0.4",
+  "description": "The VirtualGrid component is a React-based virtualized grid designed to efficiently render large datasets by dynamically loading and displaying only the visible rows. This approach enhances performance and reduces memory usage.",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup && node src/remove-assets.js && node src/copy-assets.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mntushar/ReactVirtualGrid.git"
+  },
+  "keywords": [
+    "react-virtual-grid-table",
+    "react-virtual-grid",
+    "typescript",
+    "npm",
+    "package",
+    "next",
+    "next-virtual-grid",
+    "next-virtual-grid-table",
+    "table",
+    "grid"
+  ],
+  "bugs": {
+    "url": "https://github.com/mntushar/ReactVirtualGrid/issues"
+  },
+  "homepage": "https://github.com/mntushar/ReactVirtualGrid#readme",
+  "license": "MIT",
+  "author": "M N Tushar",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/react": "^19.0.10",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
