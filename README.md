@@ -12,7 +12,15 @@ The VirtualGrid component is a React-based virtualized grid designed to efficien
 ### Column Types
 - **PropertyColumn**
     - Defines columns based on object properties.
-- **TemplateColumn** - Allows custom content (e.g., buttons, icons) inside a column.
+    - Supports optional formatting (e.g., date, uppercase, lowercase).
+    - Example:
+      ```<PropertyColumn title="Created Date" property="createdAt" format="date" />```
+    - Available formats
+         - "date" → Displays formatted date and time.
+         - "uppercase" → Converts text to uppercase.
+         - "lowercase" → Converts text to lowercase.
+- **TemplateColumn**
+    - Allows custom content (e.g., buttons, icons) inside a column.
 
 
 ### How It Works?
@@ -126,7 +134,6 @@ export default function Home() {
         sortOrder='DESC'
       >
         <PropertyColumn title="Name" property="name" />
-        {/* <PropertyColumn title="Created Date" property="createdAt" format='date' /> */}
         <PropertyColumn title="Email" property="email" />
         <TemplateColumn title="Actions">
           <button type="button" className="action-button"
