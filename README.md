@@ -41,8 +41,6 @@ The VirtualGrid component is a React-based virtualized grid designed to efficien
 
 ### Setup
 ```
-'use client'
-
 import { useCallback, useRef, useState } from "react";
 import Image from 'next/image'
 import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "react-virtual-grid-table";
