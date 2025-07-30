@@ -2,7 +2,10 @@
 
 import { useCallback, useRef, useState } from "react";
 import Image from 'next/image'
-import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "react-virtual-grid-table";
+// import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "react-virtual-grid-table";
+
+import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "../../../src/virtual_grid";
+import '../../../src/virtual_grid.css'
 
 export default function Home() {
   const gridRef = useRef<GridHandle>(null);
@@ -17,19 +20,28 @@ export default function Home() {
         sortOrder: request.sortOrder ?? '',
         searchKey: searchKey ?? '',
       });
-      const url = `http://your-url/brand?${params}`;
+      // const url = `http://your-url/brand?${params}`;
+      // const response = await fetch(url);
+      // if (!response.ok) throw new Error();
+      // const data = await response.json();
+
+      const url = `https://jsonplaceholder.typicode.com/comments`;
       const response = await fetch(url);
       if (!response.ok) throw new Error();
       const data = await response.json();
+      const itemData = data.map(({ id, body }: { id: number, body: string }) => ({
+        id: id.toString(),
+        name: body.toString()
+      }));
 
-      const countUrl = `http://your-url/brand/count?${searchKey}`;
-      const countResponse = await fetch(countUrl);
-      if (!countResponse.ok) throw new Error();
-      const count = await response.json();
+      // const countUrl = `http://your-url/brand/count?${searchKey}`;
+      // const countResponse = await fetch(countUrl);
+      // if (!countResponse.ok) throw new Error();
+      // const count = await response.json();
 
       return {
         items: data,
-        totalCount: count,
+        totalCount: 500,
       };
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -92,6 +104,11 @@ export default function Home() {
       >
         <PropertyColumn title="Name" property="name" />
         {/* <PropertyColumn title="Created Date" property="createdAt" format='date' /> */}
+        <PropertyColumn title="Email" property="email" />
+        <PropertyColumn title="Email" property="email" />
+        <PropertyColumn title="Email" property="email" />
+        <PropertyColumn title="Email" property="email" />
+        <PropertyColumn title="Email" property="email" />
         <PropertyColumn title="Email" property="email" />
         <TemplateColumn title="Actions">
           <button type="button" className="action-button"
