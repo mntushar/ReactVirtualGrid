@@ -291,4 +291,4 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
 
 VirtualGrid.displayName = "VirtualGrid";
 
-export { VirtualGrid as Grid, PropertyColumn, TemplateColumn };
+export { VirtualGrid, PropertyColumn, TemplateColumn };
