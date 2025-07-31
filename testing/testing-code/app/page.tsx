@@ -2,10 +2,10 @@
 
 import { useCallback, useRef, useState } from "react";
 import Image from 'next/image'
-// import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "react-virtual-grid-table";
+import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "react-virtual-grid-table";
 
-import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "../../../src/virtual_grid";
-import '../../../src/virtual_grid.css'
+// import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "../../../src/virtual_grid";
+// import '../../../src/virtual_grid.css'
 
 export default function Home() {
   const gridRef = useRef<GridHandle>(null);
