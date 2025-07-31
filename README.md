@@ -15,7 +15,11 @@ The VirtualGrid component is a React-based virtualised grid designed to efficien
     - Supports optional formatting (e.g., date, uppercase, lowercase).
     - Example:
       ```<PropertyColumn title="Created Date" property="createdAt" format="date" width='27%' />```
-    - Available formats
+    - title
+         - Sets the column header text that will be displayed in the table UI.
+    - property
+        - Specifies the key from the data object to be displayed in this column. **property="email"** tells the grid to render the value of the email field from each row’s data.
+    - Format
          - "date" → Displays formatted date and time.
          - "uppercase" → Converts text to uppercase.
          - "lowercase" → Converts text to lowercase.
@@ -136,9 +140,9 @@ export default function Home() {
         sortColumn='name'
         sortOrder='DESC'
       >
-        <PropertyColumn title="Name" property="name" />
+        <PropertyColumn title="Name" property="name" width='27%' />
         <PropertyColumn title="Email" property="email" />
-        <TemplateColumn title="Actions">
+        <TemplateColumn title="Actions" width={50}>
           <button type="button" className="action-button"
             onClick={(row) => handleEdit((row as any).id)}
           >
