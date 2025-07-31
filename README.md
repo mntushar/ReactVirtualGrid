@@ -1,5 +1,5 @@
 # React Virtual Grid Component
-The VirtualGrid component is a React-based virtualized grid designed to efficiently render large datasets by dynamically loading and displaying only the visible rows. This approach enhances performance and reduces memory usage.
+The VirtualGrid component is a React-based virtualised grid designed to efficiently render large datasets by dynamically loading and displaying only the visible rows. This approach enhances performance and reduces memory usage.
 
 ### Props
 - **fetchData (function)** - An asynchronous function that fetches data based on startIndex, limit, sortOrder, and sortColumn, returning items and totalCount.
@@ -23,8 +23,8 @@ The VirtualGrid component is a React-based virtualized grid designed to efficien
     - Allows custom content (e.g., buttons, icons) inside a column.
 - **width**
     - The width property defines how wide each column should be inside the VirtualGrid. The grid component uses this value to calculate and render column widths.
-    - If a percentage is provided (e.g., width="20%"), the column's width is calculated relative to the total width of the grid.
-    - If a numeric value is used (e.g., width={80}), the column width is set to a fixed number of pixels.
+    - If a percentage is provided **(e.g., width="20%")**, the column's width is calculated relative to the total width of the grid.
+    - If a numeric value is used **(e.g., width={80})**, the column width is set to a fixed number of pixels.
 
 
 ### How It Works?
