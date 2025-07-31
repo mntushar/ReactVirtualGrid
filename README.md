@@ -10,7 +10,7 @@ The VirtualGrid component is a React-based virtualized grid designed to efficien
 - **children (ReactNode)** - Used to define columns via PropertyColumn and TemplateColumn.
 
 ### Column Types
-- **PropertyColumn**
+- **Property Column**
     - Defines columns based on object properties.
     - Supports optional formatting (e.g., date, uppercase, lowercase).
     - Example:
@@ -21,6 +21,10 @@ The VirtualGrid component is a React-based virtualized grid designed to efficien
          - "lowercase" → Converts text to lowercase.
 - **TemplateColumn**
     - Allows custom content (e.g., buttons, icons) inside a column.
+- **width**
+    - The width property defines how wide each column should be inside the VirtualGrid. The grid component uses this value to calculate and render column widths.
+    - If a percentage is provided (e.g., width="20%"), the column's width is calculated relative to the total width of the grid.
+    - If a numeric value is used (e.g., width={80}), the column width is set to a fixed number of pixels.
 
 
 ### How It Works?
