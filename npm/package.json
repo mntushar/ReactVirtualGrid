@@ -1,6 +1,6 @@
 {
   "name": "react-virtual-grid-table",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "The VirtualGrid component is a React-based virtualized grid designed to efficiently render large datasets by dynamically loading and displaying only the visible rows. This approach enhances performance and reduces memory usage.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -14,6 +14,7 @@
   },
   "keywords": [
     "react-virtual-grid-table",
+    "react-virtual-table",
     "react-virtual-grid",
     "typescript",
     "npm",
@@ -21,6 +22,7 @@
     "next",
     "next-virtual-grid",
     "next-virtual-grid-table",
+    "next-virtual-table",
     "table",
     "grid"
   ],

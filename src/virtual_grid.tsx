@@ -1,4 +1,4 @@
-import React, { useEffect, useState, forwardRef, ReactNode, useRef, useCallback, useImperativeHandle } from "react";
+import React, { useEffect, useState, forwardRef, ReactNode, useRef, useCallback, useImperativeHandle, ReactElement } from "react";
 import "./virtual_grid.css";
 
 interface PropertyColumnProps {
@@ -140,17 +140,19 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
       React.Children.forEach(children, child => {
         if (React.isValidElement(child)) {
           if (child.type === PropertyColumn) {
+            const element = child as ReactElement<PropertyColumnProps>;
             pc.push({
-              title: child.props.title,
-              property: child.props.property,
-              format: child.props.format,
-              width: child.props.width
+              title: element.props.title,
+              property: element.props.property,
+              format: element.props.format,
+              width: element.props.width
             });
           } else if (child.type === TemplateColumn) {
-            tc.push({ 
-              title: child.props.title, 
-              children: child.props.children,
-              width: child.props.width
+            const element = child as ReactElement<TemplateColumnProps>;
+            tc.push({
+              title: element.props.title,
+              children: element.props.children,
+              width: element.props.width
             });
           }
         }
@@ -246,7 +248,7 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
           }}
         >
           {propertyColumns.map((col, colIndex) => (
-            <td 
+            <td
               key={colIndex}
               style={{ width: formatWidth(col.width) }}
             >
@@ -256,17 +258,20 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
             </td>
           ))}
           {templateColumns.map((template, templateIndex) => (
-            <td 
+            <td
               key={templateIndex}
               style={{ width: formatWidth(template.width) }}
             >
-              {React.Children.map(template.children, child =>
-                React.isValidElement(child)
-                  ? React.cloneElement(child as React.ReactElement, {
-                    onClick: () => child.props.onClick?.(rowData),
-                  })
-                  : child
-              )}
+              {React.Children.map(template.children, (child) => {
+                if (React.isValidElement(child)) {
+                  const element = child as React.ReactElement<{ onClick?: (data: any) => void }>;
+
+                  return React.cloneElement(element, {
+                    onClick: () => element.props.onClick?.(rowData),
+                  });
+                }
+                return child;
+              })}
             </td>
           ))}
         </tr>
@@ -277,10 +282,10 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
       <div
         ref={containerRef}
         className="virtual-grid-container"
-        style={{ 
-          height, 
+        style={{
+          height,
           overflow: "auto",
-          position: "relative" 
+          position: "relative"
         }}
         onScroll={handleScroll}
       >
@@ -288,9 +293,9 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
           <thead>
             <tr>
               {propertyColumns.map((col, idx) => (
-                <th 
-                  key={idx} 
-                  style={{ 
+                <th
+                  key={idx}
+                  style={{
                     height: rowHeight,
                     width: formatWidth(col.width)
                   }}
@@ -299,9 +304,9 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
                 </th>
               ))}
               {templateColumns.map((col, idx) => (
-                <th 
-                  key={idx} 
-                  style={{ 
+                <th
+                  key={idx}
+                  style={{
                     height: rowHeight,
                     width: formatWidth(col.width)
                   }}

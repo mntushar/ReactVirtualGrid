@@ -1,5 +1,5 @@
 # React Virtual Grid Component
-The VirtualGrid component is a React-based virtualized grid designed to efficiently render large datasets by dynamically loading and displaying only the visible rows. This approach enhances performance and reduces memory usage.
+The VirtualGrid component is a React-based virtualised grid designed to efficiently render large datasets by dynamically loading and displaying only the visible rows. This approach enhances performance and reduces memory usage.
 
 ### Props
 - **fetchData (function)** - An asynchronous function that fetches data based on startIndex, limit, sortOrder, and sortColumn, returning items and totalCount.
@@ -10,17 +10,26 @@ The VirtualGrid component is a React-based virtualized grid designed to efficien
 - **children (ReactNode)** - Used to define columns via PropertyColumn and TemplateColumn.
 
 ### Column Types
-- **PropertyColumn**
+- **Property Column**
     - Defines columns based on object properties.
     - Supports optional formatting (e.g., date, uppercase, lowercase).
     - Example:
-      ```<PropertyColumn title="Created Date" property="createdAt" format="date" />```
-    - Available formats
+      ```<PropertyColumn title="Created Date" property="createdAt" format="date" width='27%' />```
+    - title
+         - Sets the column header text that will be displayed in the table UI.
+    - property
+        - Specifies the key from the data object to be displayed in this column. **property="email"** tells the grid to render the value of the email field from each row’s data.
+    - Format
          - "date" → Displays formatted date and time.
          - "uppercase" → Converts text to uppercase.
          - "lowercase" → Converts text to lowercase.
 - **TemplateColumn**
     - Allows custom content (e.g., buttons, icons) inside a column.
+- **Common Column Property**
+    - Width
+        - The width property defines how wide each column should be inside the VirtualGrid. The grid component uses this value to calculate and render column widths.
+        - If a percentage is provided **(e.g., width="20%")**, the column's width is calculated relative to the total width of the grid.
+        - If a numeric value is used **(e.g., width={80})**, the column width is set to a fixed number of pixels.
 
 
 ### How It Works?
@@ -131,9 +140,9 @@ export default function Home() {
         sortColumn='name'
         sortOrder='DESC'
       >
-        <PropertyColumn title="Name" property="name" />
+        <PropertyColumn title="Name" property="name" width='27%' />
         <PropertyColumn title="Email" property="email" />
-        <TemplateColumn title="Actions">
+        <TemplateColumn title="Actions" width={50}>
           <button type="button" className="action-button"
             onClick={(row) => handleEdit((row as any).id)}
           >
