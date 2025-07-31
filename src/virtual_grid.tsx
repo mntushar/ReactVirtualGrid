@@ -5,11 +5,13 @@ interface PropertyColumnProps {
   title: string;
   property: string;
   format?: string | null;
+  width?: string | number;
 }
 
 interface TemplateColumnProps {
   title: string;
   children?: ReactNode;
+  width?: string | number;
 }
 
 const PropertyColumn: React.FC<PropertyColumnProps> = () => null;
@@ -75,6 +77,13 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
     });
     const scrollTimeoutRef = useRef<number | null>(null);
 
+    // Format width values
+    const formatWidth = (width?: string | number) => {
+      if (!width) return undefined;
+      if (typeof width === 'number') return `${width}px`;
+      return width;
+    };
+
     // Data fetching
     const fetchDataForRange = useCallback(async (start: number, end: number) => {
       const currentRequestId = Date.now();
@@ -134,10 +143,15 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
             pc.push({
               title: child.props.title,
               property: child.props.property,
-              format: child.props.format
+              format: child.props.format,
+              width: child.props.width
             });
           } else if (child.type === TemplateColumn) {
-            tc.push({ title: child.props.title, children: child.props.children });
+            tc.push({ 
+              title: child.props.title, 
+              children: child.props.children,
+              width: child.props.width
+            });
           }
         }
       });
@@ -232,12 +246,20 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
           }}
         >
           {propertyColumns.map((col, colIndex) => (
-            <td key={colIndex}>{col.format
-              ? applyFormat(rowData?.[col.property], col.format)
-              : rowData?.[col.property] || "..."}</td>
+            <td 
+              key={colIndex}
+              style={{ width: formatWidth(col.width) }}
+            >
+              {col.format
+                ? applyFormat(rowData?.[col.property], col.format)
+                : rowData?.[col.property] || "..."}
+            </td>
           ))}
           {templateColumns.map((template, templateIndex) => (
-            <td key={templateIndex}>
+            <td 
+              key={templateIndex}
+              style={{ width: formatWidth(template.width) }}
+            >
               {React.Children.map(template.children, child =>
                 React.isValidElement(child)
                   ? React.cloneElement(child as React.ReactElement, {
@@ -255,24 +277,44 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
       <div
         ref={containerRef}
         className="virtual-grid-container"
-        style={{ height, overflowY: "auto", position: "relative" }}
+        style={{ 
+          height, 
+          overflow: "auto",
+          position: "relative" 
+        }}
         onScroll={handleScroll}
       >
         <table style={{ width: "100%", position: "relative" }}>
           <thead>
             <tr>
               {propertyColumns.map((col, idx) => (
-                <th key={idx} style={{ height: rowHeight }}>{col.title}</th>
+                <th 
+                  key={idx} 
+                  style={{ 
+                    height: rowHeight,
+                    width: formatWidth(col.width)
+                  }}
+                >
+                  {col.title}
+                </th>
               ))}
               {templateColumns.map((col, idx) => (
-                <th key={idx} style={{ height: rowHeight }}>{col.title}</th>
+                <th 
+                  key={idx} 
+                  style={{ 
+                    height: rowHeight,
+                    width: formatWidth(col.width)
+                  }}
+                >
+                  {col.title}
+                </th>
               ))}
             </tr>
           </thead>
           <tbody style={{ position: "relative", height: totalCount * rowHeight || 'auto' }}>
             {isInitial ? (
               <tr style={{ backgroundColor: "white" }}>
-                <td style={{ height: height }} className="spinner-container">
+                <td style={{ height: height }} className="spinner-container" colSpan={propertyColumns.length + templateColumns.length}>
                   <div className="spinner"></div>
                 </td>
               </tr>

@@ -80,11 +80,11 @@ export default function Home() {
   }
 
   return (
-    <div>
+    <div style={{margin: '50px'}}>
       <h1>Alhamdulillah</h1>
       <br />
 
-      <div className="seacrh">
+      <div className="seacrh" style={{margin: '10px'}}>
         <input
           type="text"
           className="seacrh-input"
@@ -102,7 +102,7 @@ export default function Home() {
         sortColumn='name'
         sortOrder='DESC'
       >
-        <PropertyColumn title="Name" property="name" />
+        <PropertyColumn title="Name" property="name" width='27%' />
         {/* <PropertyColumn title="Created Date" property="createdAt" format='date' /> */}
         <PropertyColumn title="Email" property="email" />
         <PropertyColumn title="Email" property="email" />
@@ -110,7 +110,7 @@ export default function Home() {
         <PropertyColumn title="Email" property="email" />
         <PropertyColumn title="Email" property="email" />
         <PropertyColumn title="Email" property="email" />
-        <TemplateColumn title="Actions">
+        <TemplateColumn title="Actions" width='5%'>
           <button type="button" className="action-button"
             onClick={(row) => handleEdit((row as any).id)}
           >
