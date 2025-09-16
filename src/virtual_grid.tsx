@@ -237,16 +237,18 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
     const injectRowData = (child: React.ReactNode, rowData: any): React.ReactNode => {
       if (!React.isValidElement(child)) return child;
 
+      const element = child as React.ReactElement<any>;
+
       // If the child has an onClick, inject rowData
-      if ('onClick' in child.props) {
-        return React.cloneElement(child, {
-          onClick: () => child.props.onClick(rowData),
+      if (element.props.onClick) {
+        return React.cloneElement(element, {
+          onClick: () => element.props.onClick(rowData),
         });
       }
 
       // Otherwise, recurse into its children
-      return React.cloneElement(child, {
-        children: React.Children.map(child.props.children, (c) =>
+      return React.cloneElement(element, {
+        children: React.Children.map(element.props.children, (c) =>
           injectRowData(c, rowData)
         ),
       });
