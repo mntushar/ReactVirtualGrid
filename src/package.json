@@ -2,19 +2,18 @@
     "name": "testing-code",
     "version": "0.1.0",
     "private": true,
-    "scripts": {
-    },
+    "scripts": {},
     "dependencies": {
-      "react": "^18",
-      "react-dom": "^18",
-      "react-virtual-dropdown": "^1.1.9"
+        "react": "^19.2.0",
+        "react-dom": "^19.2.0",
+        "react-virtual-dropdown": "^1.1.9"
     },
     "devDependencies": {
-      "@types/node": "^20",
-      "@types/react": "^18",
-      "@types/react-dom": "^18",
-      "eslint": "^8",
-      "eslint-config-next": "14.2.23",
-      "typescript": "^5"
+        "@types/node": "^20",
+        "@types/react": "^18",
+        "@types/react-dom": "^18",
+        "eslint": "^8",
+        "eslint-config-next": "14.2.23",
+        "typescript": "^5"
     }
-  }
+}

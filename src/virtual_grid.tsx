@@ -220,7 +220,7 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
     }, []);
 
     const applyFormat = (value: any, format: string) => {
-      if (!value) return "...";
+      if (value === undefined || value === null) return "...";
 
       switch (format) {
         case "uppercase":
