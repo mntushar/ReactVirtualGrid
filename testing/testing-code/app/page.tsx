@@ -2,10 +2,10 @@
 
 import { useCallback, useRef, useState } from "react";
 import Image from 'next/image'
-// import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "react-virtual-grid-table";
+import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "react-virtual-grid-table";
 
-import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "../../../src/virtual_grid";
-import '../../../src/virtual_grid.css'
+// import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "../../../src/virtual_grid";
+// import '../../../src/virtual_grid.css'
 
 export default function Home() {
   const gridRef = useRef<GridHandle>(null);
@@ -106,8 +106,6 @@ export default function Home() {
         rowHeight={30}
         sortColumn='name'
         sortOrder='DESC'
-        cursor='id'
-        cursorSortColumn='email'
       >
         <PropertyColumn title="Name" property="name" width='27%' />
         {/* <PropertyColumn title="Created Date" property="createdAt" format='date' /> */}

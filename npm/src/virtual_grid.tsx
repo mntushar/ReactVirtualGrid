@@ -141,46 +141,57 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
       });
     };
 
-    // Data fetching
     const fetchDataForRange = useCallback(async (start: number, end: number) => {
       const currentRequestId = Date.now();
       requestRef.current.requestId = currentRequestId;
 
       try {
-        let cursorInfo: CursorInfo = {
-          cursor: null,
-          cursorSortColumnValue: null
-        };
+        let cursorInfo: CursorInfo = { cursor: null, cursorSortColumnValue: null };
+        let useCursor = !!(cursor && cursorSortColumn);
 
-        if (cursor && cursorSortColumn) {
+        if (useCursor) {
           cursorInfo = getCursorForStart(start);
+          if (!cursorInfo.cursor && start > 0) {
+            cursorInfo = cursorMapRef.current.get(0) || { cursor: null, cursorSortColumnValue: null };
+          }
         }
-        const count = end - start + 1;
 
-        const result = await fetchData({
-          startIndex: start,
+        const count = end - start + 1;
+        const params: any = {
           limit: count,
           sortOrder: requestRef.current.sortOrder,
           sortColumn: requestRef.current.sortColumn,
-          cursor: cursorInfo?.cursor,
-          cursorSortColumnValue: cursorInfo?.cursorSortColumnValue,
-        });
+        };
 
-        if (requestRef.current.requestId !== currentRequestId) {
-          return;
+        if (useCursor && cursorInfo.cursor) {
+          params.cursor = cursorInfo.cursor;
+          params.cursorSortColumnValue = cursorInfo.cursorSortColumnValue;
+        } else {
+          params.startIndex = start;
         }
+
+        const result = await fetchData(params);
+
+        if (requestRef.current.requestId !== currentRequestId) return;
 
         setData(prev => {
           const newMap = new Map(prev);
-          result.items.forEach((item, index) => {
-            newMap.set(start + index, item);
-          });
+          if (useCursor && cursorInfo.cursor) {
+            const currentSize = prev.size;
+            result.items.forEach((item, idx) => {
+              newMap.set(currentSize + idx, item);
+            });
+            saveNextCursor(currentSize, result.items);
+          } else {
+            result.items.forEach((item, idx) => {
+              newMap.set(start + idx, item);
+            });
+            if (cursor && cursorSortColumn) {
+              saveNextCursor(start, result.items);
+            }
+          }
           return newMap;
         });
-
-        if (cursor && cursorSortColumn) {
-          saveNextCursor(start, result.items);
-        }
 
         if (result.totalCount !== totalCount) {
           setTotalCount(result.totalCount);
@@ -188,7 +199,7 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
       } catch (error) {
         console.error("Failed to fetch data:", error);
       }
-    }, [fetchData, totalCount]);
+    }, [fetchData, totalCount, cursor, cursorSortColumn]);
 
     const refresh = useCallback(async () => {
       setIsRefresh(true);
