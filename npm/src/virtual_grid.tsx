@@ -28,6 +28,8 @@ type FetchDataFunction = (request: {
   limit: number;
   sortOrder: string | null;
   sortColumn: string;
+  cursor: string | null;
+  cursorSortColumnValue: string | null;
 }) => Promise<FetchDataResult>;
 
 interface GridProps {
@@ -36,7 +38,18 @@ interface GridProps {
   rowHeight: number;
   sortOrder?: string | null;
   sortColumn: string;
+  cursor?: string | null;
+  cursorSortColumn?: string | null;
   children: ReactNode;
+}
+
+type CursorInfo = {
+  cursor: string | null;
+  cursorSortColumnValue: string | null;
+};
+
+export interface GridHandle {
+  refresh: () => void;
 }
 
 export interface GridRequest {
@@ -44,6 +57,8 @@ export interface GridRequest {
   limit: number;
   sortOrder: string | null;
   sortColumn: string;
+  cursor: string | null;
+  cursorSortColumnValue: string | null;
 }
 
 export interface GridHandle {
@@ -58,6 +73,8 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
       rowHeight,
       sortOrder = null,
       sortColumn,
+      cursor = null,
+      cursorSortColumn = null,
       children,
     },
     ref
@@ -75,8 +92,11 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
       sortOrder,
       sortColumn,
       requestId: 0,
+      cursor,
+      cursorSortColumn
     });
     const scrollTimeoutRef = useRef<number | null>(null);
+    const cursorMapRef = useRef<Map<number, CursorInfo>>(new Map());
 
     // Format width values
     const formatWidth = (width?: string | number) => {
@@ -85,18 +105,65 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
       return width;
     };
 
+    // cursor pagination
+    const getCursorForStart = (start: number): CursorInfo => {
+      let keys = Array.from(cursorMapRef.current.keys()).sort((a, b) => a - b);
+
+      for (let i = keys.length - 1; i >= 0; i--) {
+        if (keys[i] < start) {
+          return cursorMapRef.current.get(keys[i])!;
+        }
+      }
+
+      return {
+        cursor: null,
+        cursorSortColumnValue: null,
+      };
+
+    };
+
+    const saveNextCursor = (
+      start: number,
+      items: any[]
+    ) => {
+      if (!items.length) return;
+
+      const lastItem = items[items.length - 1];
+
+      const cursorField = requestRef.current.cursor;
+      const cursorSortField = requestRef.current.cursorSortColumn;
+
+      cursorMapRef.current.set(start, {
+        cursor: cursorField ? String(lastItem?.[cursorField] ?? "") || null : null,
+        cursorSortColumnValue: cursorSortField
+          ? String(lastItem?.[cursorSortField] ?? "") || null
+          : null,
+      });
+    };
+
     // Data fetching
     const fetchDataForRange = useCallback(async (start: number, end: number) => {
       const currentRequestId = Date.now();
       requestRef.current.requestId = currentRequestId;
 
       try {
+        let cursorInfo: CursorInfo = {
+          cursor: null,
+          cursorSortColumnValue: null
+        };
+
+        if (cursor && cursorSortColumn) {
+          cursorInfo = getCursorForStart(start);
+        }
         const count = end - start + 1;
+
         const result = await fetchData({
           startIndex: start,
           limit: count,
           sortOrder: requestRef.current.sortOrder,
           sortColumn: requestRef.current.sortColumn,
+          cursor: cursorInfo?.cursor,
+          cursorSortColumnValue: cursorInfo?.cursorSortColumnValue,
         });
 
         if (requestRef.current.requestId !== currentRequestId) {
@@ -110,6 +177,10 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
           });
           return newMap;
         });
+
+        if (cursor && cursorSortColumn) {
+          saveNextCursor(start, result.items);
+        }
 
         if (result.totalCount !== totalCount) {
           setTotalCount(result.totalCount);
