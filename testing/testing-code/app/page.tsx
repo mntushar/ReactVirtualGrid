@@ -2,10 +2,10 @@
 
 import { useCallback, useRef, useState } from "react";
 import Image from 'next/image'
-import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "react-virtual-grid-table";
+// import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "react-virtual-grid-table";
 
-// import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "../../../src/virtual_grid";
-// import '../../../src/virtual_grid.css'
+import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "../../../src/virtual_grid";
+import '../../../src/virtual_grid.css'
 
 export default function Home() {
   const gridRef = useRef<GridHandle>(null);
@@ -13,19 +13,24 @@ export default function Home() {
 
   const fetchData = useCallback(async (request: GridRequest) => {
     try {
+      const skip = request.startIndex.toString();
+      const limit = request.limit.toString();
       const params = new URLSearchParams({
         skip: request.startIndex.toString(),
         limit: request.limit.toString(),
         sortColumn: request.sortColumn ?? '',
         sortOrder: request.sortOrder ?? '',
         searchKey: searchKey ?? '',
+        cursor: request.cursor ?? '',
+        cursorSortColumnValue: request.cursorSortColumnValue ?? '',
       });
+      console.log(params.toString());
       // const url = `http://your-url/brand?${params}`;
       // const response = await fetch(url);
       // if (!response.ok) throw new Error();
       // const data = await response.json();
 
-      const url = `https://jsonplaceholder.typicode.com/comments`;
+      const url = `https://jsonplaceholder.typicode.com/comments?_start=${skip}&_limit=${limit}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error();
       const data = await response.json();
@@ -101,6 +106,8 @@ export default function Home() {
         rowHeight={30}
         sortColumn='name'
         sortOrder='DESC'
+        cursor='id'
+        cursorSortColumn='email'
       >
         <PropertyColumn title="Name" property="name" width='27%' />
         {/* <PropertyColumn title="Created Date" property="createdAt" format='date' /> */}
