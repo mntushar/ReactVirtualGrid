@@ -1,6 +1,6 @@
 # React Virtual Grid Component
 
-The VirtualGrid component is a React-based virtualised grid designed to efficiently render large datasets by dynamically loading and displaying only the visible rows. This approach enhances performance and reduces memory usage.It supports both offset and cursor pagination.
+The VirtualGrid component is a React-based virtualised grid designed to efficiently render large datasets by dynamically loading and displaying only the visible rows. This approach enhances performance and reduces memory usage. It supports both offset and cursor pagination.
 
 ### Props
 
