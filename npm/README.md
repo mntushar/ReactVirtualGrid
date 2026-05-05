@@ -274,6 +274,8 @@ export default function Home() {
         rowHeight={30}
         sortColumn='name'
         sortOrder='DESC'
+        cursor='id'
+        cursorSortColumn='email'
       >
         <PropertyColumn title="Name" property="name" width='27%' />
         <PropertyColumn title="Email" property="email" />
