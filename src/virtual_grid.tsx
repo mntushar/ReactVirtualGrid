@@ -48,6 +48,7 @@ type CursorInfo = {
 
 export interface GridHandle {
   refresh: (isReset?: boolean | null) => void;
+  refreshAfterDelete: (identity: string, identityValue: string) => void;
 }
 
 export interface GridRequest {
@@ -57,10 +58,6 @@ export interface GridRequest {
   sortColumn: string;
   cursor: string | null;
   cursorSortColumnValue: string | null;
-}
-
-export interface GridHandle {
-  refresh: (isReset?: boolean | null) => void;
 }
 
 const VirtualGrid = forwardRef<GridHandle, GridProps>(
@@ -220,9 +217,46 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const refreshAfterDelete = useCallback(
+      async (identity: string, identityValue: string) => {
+        setData(prev => {
+          let deletedKey: number | null = null;
+
+          for (const [key, value] of prev.entries()) {
+            if (value?.[identity] === identityValue) {
+              deletedKey = key;
+              break;
+            }
+          }
+
+          if (deletedKey === null) return prev;
+
+          const newMap = new Map(prev);
+
+          for (let i = deletedKey; i < totalCount - 1; i++) {
+            const nextValue = newMap.get(i + 1);
+
+            if (nextValue !== undefined) {
+              newMap.set(i, nextValue);
+            } else {
+              newMap.delete(i);
+            }
+          }
+
+          newMap.delete(totalCount - 1);
+
+          return newMap;
+        });
+
+        setTotalCount(prev => Math.max(0, prev - 1));
+      },
+      [totalCount]
+    );
+
     useImperativeHandle(ref, () => ({
       refresh,
-    }), [refresh]);
+      refreshAfterDelete,
+    }), [refresh, refreshAfterDelete]);
 
     // Column extraction
     useEffect(() => {

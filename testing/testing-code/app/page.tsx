@@ -2,10 +2,10 @@
 
 import { useCallback, useRef, useState } from "react";
 import Image from 'next/image'
-import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "react-virtual-grid-table";
+// import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "react-virtual-grid-table";
 
-// import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "../../../src/virtual_grid";
-// import '../../../src/virtual_grid.css'
+import { GridHandle, GridRequest, PropertyColumn, TemplateColumn, VirtualGrid } from "../../../src/virtual_grid";
+import '../../../src/virtual_grid.css'
 
 export default function Home() {
   const gridRef = useRef<GridHandle>(null);
@@ -57,9 +57,12 @@ export default function Home() {
     }
   }, [searchKey]);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     try {
-      console.log(id)
+
+      await fetch(`https://jsonplaceholder.typicode.com/comments/${id}`, {
+        method: 'DELETE',
+      });
       gridRef.current?.refresh();
     } catch (error) {
       console.error("Error deleting item:", error);
@@ -85,11 +88,11 @@ export default function Home() {
   }
 
   return (
-    <div style={{margin: '50px'}}>
+    <div style={{ margin: '50px' }}>
       <h1>Alhamdulillah</h1>
       <br />
 
-      <div className="seacrh" style={{margin: '10px'}}>
+      <div className="seacrh" style={{ margin: '10px' }}>
         <input
           type="text"
           className="seacrh-input"
@@ -117,7 +120,7 @@ export default function Home() {
         <PropertyColumn title="Email" property="email" />
         <TemplateColumn title="Actions" width='5%'>
           <button type="button" className="action-button"
-            onClick={(row) => handleEdit((row as any).id)}
+            onClick={(row) => handleDelete((row as any).id)}
           >
             <Image
               src='/images/icons8-edit-64.png'
