@@ -39,7 +39,6 @@ interface GridProps {
   sortOrder?: string | null;
   sortColumn: string;
   cursor?: string | null;
-  cursorSortColumn?: string | null;
   children: ReactNode;
 }
 
@@ -49,7 +48,8 @@ type CursorInfo = {
 };
 
 export interface GridHandle {
-  refresh: () => void;
+  refresh: (isReset?: boolean | null) => void;
+  refreshAfterDelete: (identity: string, identityValue: string) => void;
 }
 
 export interface GridRequest {
@@ -61,10 +61,6 @@ export interface GridRequest {
   cursorSortColumnValue: string | null;
 }
 
-export interface GridHandle {
-  refresh: () => void;
-}
-
 const VirtualGrid = forwardRef<GridHandle, GridProps>(
   (
     {
@@ -74,15 +70,16 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
       sortOrder = null,
       sortColumn,
       cursor = null,
-      cursorSortColumn = null,
       children,
     },
     ref
   ) => {
     const buffer = 10;
+    const initialVisibleRows = Math.ceil(height / rowHeight) + buffer * 2;
     const [data, setData] = useState<Map<number, any>>(new Map());
     const [totalCount, setTotalCount] = useState(0);
     const [isRefresh, setIsRefresh] = useState(false);
+    const [isReset, setIsReset] = useState(false);
     const [isInitial, setIsInitial] = useState(true);
     const [propertyColumns, setPropertyColumns] = useState<PropertyColumnProps[]>([]);
     const [templateColumns, setTemplateColumns] = useState<TemplateColumnProps[]>([]);
@@ -92,8 +89,7 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
       sortOrder,
       sortColumn,
       requestId: 0,
-      cursor,
-      cursorSortColumn
+      cursor
     });
     const scrollTimeoutRef = useRef<number | null>(null);
     const cursorMapRef = useRef<Map<number, CursorInfo>>(new Map());
@@ -131,7 +127,7 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
       const lastItem = items[items.length - 1];
 
       const cursorField = requestRef.current.cursor;
-      const cursorSortField = requestRef.current.cursorSortColumn;
+      const cursorSortField = requestRef.current.sortColumn;
 
       cursorMapRef.current.set(start, {
         cursor: cursorField ? String(lastItem?.[cursorField] ?? "") || null : null,
@@ -147,8 +143,7 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
 
       try {
         let cursorInfo: CursorInfo = { cursor: null, cursorSortColumnValue: null };
-        let useCursor = !!(cursor && cursorSortColumn);
-
+        let useCursor = !!(requestRef.current.cursor);
         if (useCursor) {
           cursorInfo = getCursorForStart(start);
           if (!cursorInfo.cursor && start > 0) {
@@ -186,7 +181,7 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
             result.items.forEach((item, idx) => {
               newMap.set(start + idx, item);
             });
-            if (cursor && cursorSortColumn) {
+            if (cursor) {
               saveNextCursor(start, result.items);
             }
           }
@@ -199,21 +194,70 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
       } catch (error) {
         console.error("Failed to fetch data:", error);
       }
-    }, [fetchData, totalCount, cursor, cursorSortColumn]);
+    }, [fetchData, totalCount, cursor]);
 
-    const refresh = useCallback(async () => {
-      setIsRefresh(true);
-      const currentRequestId = Date.now();
-      requestRef.current.requestId = currentRequestId;
-      setTimeout(() => {
-        setIsRefresh(false);
-      }, 10)
+    const refresh = useCallback(async (isReset?: boolean | null) => {
+      if (isReset) {
+        setIsReset(true);
+        requestRef.current.cursor = null;
+        const currentRequestId = Date.now();
+        requestRef.current.requestId = currentRequestId;
+        setVisibleRange({ start: 0, end: initialVisibleRows - 1 });
+        setTimeout(() => {
+          setIsReset(false);
+        }, 10)
+      }
+      else {
+        setIsRefresh(true);
+        const currentRequestId = Date.now();
+        requestRef.current.requestId = currentRequestId;
+        setTimeout(() => {
+          setIsRefresh(false);
+        }, 10)
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const refreshAfterDelete = useCallback(
+      async (identity: string, identityValue: string) => {
+        setData(prev => {
+          let deletedKey: number | null = null;
+
+          for (const [key, value] of prev.entries()) {
+            if (value?.[identity] === identityValue) {
+              deletedKey = key;
+              break;
+            }
+          }
+
+          if (deletedKey === null) return prev;
+
+          const newMap = new Map(prev);
+
+          for (let i = deletedKey; i < totalCount - 1; i++) {
+            const nextValue = newMap.get(i + 1);
+
+            if (nextValue !== undefined) {
+              newMap.set(i, nextValue);
+            } else {
+              newMap.delete(i);
+            }
+          }
+
+          newMap.delete(totalCount - 1);
+
+          return newMap;
+        });
+
+        setTotalCount(prev => Math.max(0, prev - 1));
+      },
+      [totalCount]
+    );
+
     useImperativeHandle(ref, () => ({
       refresh,
-    }), [refresh]);
+      refreshAfterDelete,
+    }), [refresh, refreshAfterDelete]);
 
     // Column extraction
     useEffect(() => {
@@ -279,7 +323,6 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
     useEffect(() => {
       const fetchData = async () => {
         if (isInitial) {
-          const initialVisibleRows = Math.ceil(height / rowHeight) + buffer * 2;
           await fetchDataForRange(0, initialVisibleRows - 1);
           setIsInitial(false);
         }
@@ -292,6 +335,17 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
       fetchData();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isRefresh]);
+
+    useEffect(() => {
+      const fetchData = async () => {
+        if (isReset && !isInitial) {
+          await fetchDataForRange(visibleRange.start, (initialVisibleRows - 1));
+          requestRef.current.cursor = cursor;
+        }
+      }
+      fetchData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isReset]);
 
     // Cleanup timeout on unmount
     useEffect(() => {

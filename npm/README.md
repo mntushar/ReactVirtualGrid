@@ -11,7 +11,6 @@ The VirtualGrid component is a React-based virtualised grid designed to efficien
 - **sortColumn (string)** - The column by which data should be sorted.
 - **children (ReactNode)** - Used to define columns via PropertyColumn and TemplateColumn.
 - **cursor (string | null)** - The field name to use for cursor-based pagination.
-- **cursorSortColumn (string | null)** - The column used to sort when applying cursor-based pagination.
 
 ### Column Types
 
@@ -35,6 +34,11 @@ The VirtualGrid component is a React-based virtualised grid designed to efficien
     - The width property defines how wide each column should be inside the VirtualGrid. The grid component uses this value to calculate and render column widths.
     - If a percentage is provided **(e.g., width="20%")**, the column's width is calculated relative to the total width of the grid.
     - If a numeric value is used **(e.g., width={80})**, the column width is set to a fixed number of pixels.
+
+### Imperative Grid Methods
+
+- **refresh(isReset?: boolean | null)** - Refreshes the grid data. Use refresh() for offset pagination and refresh(true) to reset the grid when using cursor pagination.
+- **refreshAfterDelete(identity: string, identityValue: string)** - Reloads the grid after deleting an item. identity is the column name, and identityValue is the deleted row's column value.
 
 ### How It Works?
 
@@ -275,7 +279,6 @@ export default function Home() {
         sortColumn='name'
         sortOrder='DESC'
         cursor='id'
-        cursorSortColumn='email'
       >
         <PropertyColumn title="Name" property="name" width='27%' />
         <PropertyColumn title="Email" property="email" />
