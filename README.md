@@ -39,6 +39,7 @@ The VirtualGrid component is a React-based virtualised grid designed to efficien
 
 - **refresh(isReset?: boolean | null)** - Refreshes the grid data. Use refresh() for offset pagination and refresh(true) to reset the grid when using cursor pagination.
 - **refreshAfterDelete(identity: string, identityValue: string)** - Reloads the grid after deleting an item. identity is the column name, and identityValue is the deleted row's column value.
+- **refreshAfterUpdate(identity: string, identityValue: string, value: any)** - Reloads the grid after update an item. identity is the column name, identityValue is the update row's column value and value is new replace item value.
 
 ### How It Works?
 
@@ -113,9 +114,16 @@ export default function Home() {
     }
   };
 
-  const handleEdit = (id: string) => {
+  const handleEdit = async (id: string) => {
     try {
       console.log(id);
+      const result = await requestHandler.get(id);
+      if (!result) throw new Error('Bad request');
+      gridRef.current?.refreshAfterUpdate(
+        'id',
+        id,
+        mapData(result)
+      );
     } catch (error) {
       console.error(error);
     }
@@ -241,6 +249,13 @@ export default function Home() {
   const handleEdit = (id: string) => {
     try {
       console.log(id);
+      const result = await requestHandler.get(id);
+      if (!result) throw new Error('Bad request');
+      gridRef.current?.refreshAfterUpdate(
+        'id',
+        id,
+        mapData(result)
+      );
     } catch (error) {
       console.error(error);
     }
