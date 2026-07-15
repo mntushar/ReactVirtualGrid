@@ -50,6 +50,7 @@ type CursorInfo = {
 export interface GridHandle {
   refresh: (isReset?: boolean | null) => void;
   refreshAfterDelete: (identity: string, identityValue: string) => void;
+  refreshAfterUpdate: (identity: string, identityValue: string, value: any) => void;
 }
 
 export interface GridRequest {
@@ -254,10 +255,29 @@ const VirtualGrid = forwardRef<GridHandle, GridProps>(
       [totalCount]
     );
 
+    const refreshAfterUpdate = useCallback(
+      async (identity: string, identityValue: string, value: any) => {
+        setData(prev => {
+          const newMap = new Map(prev);
+
+          for (const [key, item] of newMap.entries()) {
+            if (item?.[identity] === identityValue) {
+              newMap.set(key, value);
+              break;
+            }
+          }
+
+          return newMap;
+        });
+      },
+      []
+    );
+
     useImperativeHandle(ref, () => ({
       refresh,
       refreshAfterDelete,
-    }), [refresh, refreshAfterDelete]);
+      refreshAfterUpdate
+    }), [refresh, refreshAfterDelete, refreshAfterUpdate]);
 
     // Column extraction
     useEffect(() => {
